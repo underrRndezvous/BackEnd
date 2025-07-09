@@ -23,6 +23,11 @@ spring:
 #       mode: always
 # #      schema-locations: classpath:
 # #        data-locations: classpath:
+
+kakao:
+  client-id: 8c726ec0ff9d015553a536f3bfa6f551
+  redirect-uri: http://localhost:3000/redirect
+
 logging:
   level:
     org:
