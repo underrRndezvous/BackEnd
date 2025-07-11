@@ -9,4 +9,7 @@ import lombok.Setter;
 @Setter
 public class KakaoLoginRequest {
     private String code;
+
+
 }
+
