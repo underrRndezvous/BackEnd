@@ -2,6 +2,7 @@ package com.underrRndezvous.backend.controller;
 
 import com.underrRndezvous.backend.controller.dto.response.CommonErrorResponse;
 import com.underrRndezvous.backend.controller.dto.response.CommonValidationError;
+import com.underrRndezvous.backend.exception.base.NotExistBaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -31,6 +32,12 @@ public class ExceptionController {
     @ExceptionHandler(RuntimeException.class)
     public CommonErrorResponse runtimeExceptionHandler(RuntimeException e) {
         return new CommonErrorResponse("400",e.toString());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotExistBaseException.class)
+    public CommonErrorResponse notExistBaseExceptionHandler(Exception e) {
+        return new CommonErrorResponse("404", e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

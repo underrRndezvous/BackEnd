@@ -50,7 +50,6 @@ public class UserControllerTest {
     @DisplayName("만약 카카오 로그인이 성공하는 경우 카카오 로그인이 성공해야된다.")
     void kakaoLoginAPITest() throws Exception {
         KakaoLoginRequest kakaoLoginRequest = new KakaoLoginRequest("asdasdasdas");
-        KakaoUserInfoResponse kakaoUserInfoResponse = new KakaoUserInfoResponse(1L,"asdasdasdasd","asdasdasd@naver.com");
 
         given(userService.kakaoLoginProcess(any(KakaoLoginRequest.class))).willReturn(1L);
 
