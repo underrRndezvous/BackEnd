@@ -1,9 +1,8 @@
 package com.underrRndezvous.backend.controller;
 
 
-import com.underrRndezvous.backend.client.kakao.KakaoUserInfoResponse;
 import com.underrRndezvous.backend.config.ConstValue;
-import com.underrRndezvous.backend.dto.KakaoLoginRequest;
+import com.underrRndezvous.backend.controller.dto.KakaoLoginRequest;
 import com.underrRndezvous.backend.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

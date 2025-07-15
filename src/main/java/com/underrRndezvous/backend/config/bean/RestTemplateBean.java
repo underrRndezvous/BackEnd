@@ -11,6 +11,7 @@ public class RestTemplateBean {
     @Bean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.acceptHeaderRequestCallback(RestTemplateResponseErrorHandler.class);
         return restTemplate;
     }
 

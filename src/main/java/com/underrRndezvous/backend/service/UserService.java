@@ -3,7 +3,7 @@ package com.underrRndezvous.backend.service;
 import com.underrRndezvous.backend.client.kakao.KakaoClient;
 import com.underrRndezvous.backend.client.kakao.KakaoUserInfoResponse;
 import com.underrRndezvous.backend.domain.User;
-import com.underrRndezvous.backend.dto.KakaoLoginRequest;
+import com.underrRndezvous.backend.controller.dto.KakaoLoginRequest;
 import com.underrRndezvous.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +23,9 @@ public class UserService {
 
     @Transactional
     public Long kakaoLoginProcess(KakaoLoginRequest kakaoLoginRequest) {
-        KakaoUserInfoResponse userInfo = kakaoClient.getUserInfo(kakaoClient.getAccessToken(kakaoLoginRequest.getCode()));
-
+        String accessToken = kakaoClient.getAccessToken(kakaoLoginRequest.getCode());
+        KakaoUserInfoResponse userInfo = kakaoClient.getUserInfo(accessToken);
         Optional<User> findUser = userRepository.findUserByKakaoUserId(userInfo.getId());
-
         log.info("findUser={}", findUser.orElse(null));
 
         if(findUser.isEmpty()) {
