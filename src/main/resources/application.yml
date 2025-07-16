@@ -36,3 +36,9 @@ logging:
         type:
           descriptor:
             sql: trace
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false # Secure 비활성화
+        same-site: none # Lax로 설정

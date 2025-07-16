@@ -1,6 +1,9 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.place;
 
 import com.underrRndezvous.backend.domain.enums.PlaceType;
+import com.underrRndezvous.backend.domain.meeting.MeetingPlaceCategory;
+import com.underrRndezvous.backend.domain.place.Mood;
+import com.underrRndezvous.backend.domain.place.Place;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,9 +29,9 @@ public class PlaceCategory {
     @OneToMany(mappedBy = "category")
     private List<Place> places;
 
-    @OneToMany(mappedBy = "placeCategory", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<MeetingPlaceCategory> meetingPlaceCategories;
 
-    @OneToMany(mappedBy = "placeCategory")
+    @OneToMany(mappedBy = "category")
     private List<Mood> moods;
 }

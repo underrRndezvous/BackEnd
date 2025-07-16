@@ -1,5 +1,6 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.place;
 
+import com.underrRndezvous.backend.domain.meeting.CategoryMood;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,26 +11,21 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "meeting_place_categories")
-public class MeetingPlaceCategory {
+@Table(name = "moods")
+public class Mood {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "meeting_place_category_id")
+    @Column(name = "mood_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meeting_id", nullable = false)
-    private Meeting meeting;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private PlaceCategory category;
 
-    @Column(name = "place_count", nullable = false)
-    private int placeCount;
-
-    @OneToMany(mappedBy = "meetingPlaceCategory", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "mood", cascade = CascadeType.ALL)
     private List<CategoryMood> categoryMoods;
-
 }

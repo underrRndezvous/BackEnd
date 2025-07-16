@@ -1,5 +1,6 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.place;
 
+import com.underrRndezvous.backend.domain.meeting.MeetingArea;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

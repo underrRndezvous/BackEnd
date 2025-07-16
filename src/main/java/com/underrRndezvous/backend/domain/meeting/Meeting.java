@@ -1,7 +1,9 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.meeting;
 
+import com.underrRndezvous.backend.domain.common.BaseEntity;
 import com.underrRndezvous.backend.domain.enums.MeetingType;
 import com.underrRndezvous.backend.domain.enums.TimeType;
+import com.underrRndezvous.backend.domain.user.MeetingUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

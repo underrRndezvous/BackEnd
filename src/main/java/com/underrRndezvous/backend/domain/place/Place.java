@@ -1,4 +1,4 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.place;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

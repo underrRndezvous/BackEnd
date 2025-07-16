@@ -1,5 +1,7 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.meeting;
 
+import com.underrRndezvous.backend.domain.place.Mood;
+import com.underrRndezvous.backend.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "category_moods")
-public class CategoryMood {
+public class CategoryMood extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

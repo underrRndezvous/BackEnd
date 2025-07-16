@@ -1,23 +1,26 @@
-package com.underrRndezvous.backend.service;
+package com.underrRndezvous.backend.client.kakao;
 
-import com.underrRndezvous.backend.dto.KakaoOAuthToken;
-import com.underrRndezvous.backend.dto.KakaoUserInfo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-@Service
-public class KakaoService {
-    @Value("${kakao.client-id}")           private String clientId;
-    @Value("${kakao.redirect-uri}")        private String redirectUri;
+@RequiredArgsConstructor
+@Component
+public class KakaoClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Value("${kakao.client-id}")
+    private String clientId;
+    @Value("${kakao.redirect-uri}")
+    private String redirectUri;
+
+    private final RestTemplate restTemplate;
 
     // 1) 인가 코드로 액세스 토큰 발급
     public String getAccessToken(String code) {
@@ -33,13 +36,13 @@ public class KakaoService {
         params.add("code",         code);
 
         HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(params, headers);
-        KakaoOAuthToken response = restTemplate.postForObject(tokenUrl, request, KakaoOAuthToken.class);
+        KakaoOAuthTokenRequest response = restTemplate.postForObject(tokenUrl, request, KakaoOAuthTokenRequest.class);
 
         return response.getAccessToken();
     }
 
     // 2) 액세스 토큰으로 유저 정보 조회
-    public KakaoUserInfo getUserInfo(String accessToken) {
+    public KakaoUserInfoResponse getUserInfo(String accessToken) {
         String userUrl = "https://kapi.kakao.com/v2/user/me";
 
         // 헤더에 Bearer 토큰 세팅
@@ -67,7 +70,7 @@ public class KakaoService {
         Map<String, Object> kakaoAccount = (Map<String, Object>) response.get("kakao_account");
 
         // DTO에 담아서 반환
-        KakaoUserInfo info = new KakaoUserInfo();
+        KakaoUserInfoResponse info = new KakaoUserInfoResponse();
         info.setId(id);
         info.setNickname((String) properties.get("nickname"));
         info.setEmail((String) kakaoAccount.get("email"));
@@ -76,7 +79,7 @@ public class KakaoService {
     }
 
     // 통합 메서드
-    public KakaoUserInfo processKakaoLogin(String code) {
+    public KakaoUserInfoResponse processKakaoLogin(String code) {
         String token = getAccessToken(code);
         return getUserInfo(token);
     }
