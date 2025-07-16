@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,8 +30,8 @@ public class Area {
     private int longitude;
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
-    private List<MeetingArea> meetingAreas;
+    private List<MeetingArea> meetingAreas = new ArrayList<>();
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
-    private List<Place> places;
+    private List<Place> places = new ArrayList<>();
 }

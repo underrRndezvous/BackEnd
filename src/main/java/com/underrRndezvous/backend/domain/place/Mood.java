@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,5 +28,5 @@ public class Mood {
     private PlaceCategory category;
 
     @OneToMany(mappedBy = "mood", cascade = CascadeType.ALL)
-    private List<CategoryMood> categoryMoods;
+    private List<CategoryMood> categoryMoods = new ArrayList<>();
 }

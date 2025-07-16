@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,6 @@ public class MeetingPlaceCategory extends BaseEntity {
     private int placeCount;
 
     @OneToMany(mappedBy = "meetingPlaceCategory", cascade = CascadeType.ALL)
-    private List<CategoryMood> categoryMoods;
+    private List<CategoryMood> categoryMoods = new ArrayList<>();
 
 }

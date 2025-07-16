@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,12 +34,12 @@ public class Meeting extends BaseEntity {
     private TimeType meetingTime;
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
-    private List<MeetingUser> meetingUsers;
+    private List<MeetingUser> meetingUsers = new ArrayList<>();
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
-    private List<MeetingArea> meetingAreas;
+    private List<MeetingArea> meetingAreas = new ArrayList<>();
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
-    private List<MeetingPlaceCategory> placeCategories;
+    private List<MeetingPlaceCategory> placeCategories = new ArrayList<>();
 
 }
