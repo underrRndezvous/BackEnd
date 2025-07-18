@@ -1,20 +1,21 @@
-package com.underrRndezvous.backend.domain;
+package com.underrRndezvous.backend.domain.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.underrRndezvous.backend.domain.common.BaseEntity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity(name="users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity{
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -30,6 +31,9 @@ public class User extends BaseEntity{
     @Column(name="email", nullable = false)
     private String email;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<MeetingUser> meetingUsers = new ArrayList<>();
+
     @Builder
     private User(Long kakaoUserId, String nickName, String email) {
         this.kakaoUserId = kakaoUserId;
@@ -44,5 +48,4 @@ public class User extends BaseEntity{
                 .email(email)
                 .build();
     }
-
 }
