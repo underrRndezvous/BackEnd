@@ -4,8 +4,14 @@ spring:
       ddl-auto: create #create, create-drop, update ...
     properties:
       hibernate:
+        format_sql: true
         show_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  session:
+    jdbc:
+      store-type: jdbc
+      table-name: SPRING_SESSION
+      initialize-schema: always
   h2:
     console:
       enabled: true
