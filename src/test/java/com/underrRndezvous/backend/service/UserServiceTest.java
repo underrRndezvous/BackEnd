@@ -3,7 +3,7 @@ package com.underrRndezvous.backend.service;
 import com.underrRndezvous.backend.client.kakao.KakaoClient;
 import com.underrRndezvous.backend.client.kakao.KakaoUserInfoResponse;
 import com.underrRndezvous.backend.controller.dto.KakaoLoginRequest;
-import com.underrRndezvous.backend.domain.User;
+import com.underrRndezvous.backend.domain.user.User;
 import com.underrRndezvous.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

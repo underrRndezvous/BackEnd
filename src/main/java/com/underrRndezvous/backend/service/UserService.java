@@ -2,8 +2,8 @@ package com.underrRndezvous.backend.service;
 
 import com.underrRndezvous.backend.client.kakao.KakaoClient;
 import com.underrRndezvous.backend.client.kakao.KakaoUserInfoResponse;
-import com.underrRndezvous.backend.controller.dto.KakaoLoginRequest;
 import com.underrRndezvous.backend.domain.user.User;
+import com.underrRndezvous.backend.controller.dto.KakaoLoginRequest;
 import com.underrRndezvous.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,8 @@
 package com.underrRndezvous.backend.domain.user;
 
 import com.underrRndezvous.backend.domain.common.BaseEntity;
+import com.underrRndezvous.backend.domain.enums.MeetingType;
+import com.underrRndezvous.backend.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,6 +32,10 @@ public class User extends BaseEntity {
 
     @Column(name="email", nullable = false)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<MeetingUser> meetingUsers = new ArrayList<>();

@@ -21,7 +21,7 @@ public class Meeting extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
-    private Long id;
+    private Long meetingId;
 
     @Column(name = "meeting_name")
     private String name;
