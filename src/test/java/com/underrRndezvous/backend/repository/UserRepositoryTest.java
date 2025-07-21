@@ -1,6 +1,6 @@
 package com.underrRndezvous.backend.repository;
 
-import com.underrRndezvous.backend.domain.User;
+import com.underrRndezvous.backend.domain.user.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

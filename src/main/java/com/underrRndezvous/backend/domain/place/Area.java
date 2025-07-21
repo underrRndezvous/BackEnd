@@ -1,5 +1,6 @@
 package com.underrRndezvous.backend.domain.place;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.underrRndezvous.backend.domain.meeting.MeetingArea;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -18,20 +19,31 @@ public class Area {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "area_id")
-    private Long id;
+    private Long areaId;
 
     @Column(name = "area_name", nullable = false)
-    private String name;
+    @JsonProperty("hotplaceName")
+    private String areaName;
 
     @Column(name = "latitude", nullable = false)
-    private int latitude;
+    private Double latitude;
 
     @Column(name = "longitude", nullable = false)
-    private int longitude;
+    private Double longitude;
+
+    // @Column(name = "distance") // 보류
+    // private Double distance;
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
     private List<MeetingArea> meetingAreas = new ArrayList<>();
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
     private List<Place> places = new ArrayList<>();
+
+    public Area(Long areaId, String areaName, Double latitude, Double longitude) {
+        this.areaId = areaId;
+        this.areaName = areaName;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
