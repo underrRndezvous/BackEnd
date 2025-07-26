@@ -34,7 +34,7 @@ public class DataLoader implements ApplicationRunner {
             List<Location> locations = locDtos.stream()
                     .map(dto -> new Location(
                             null,
-                            dto.getSido(),
+                            dto.getSi(),
                             dto.getGu(),
                             dto.getDong(),
                             dto.getLat(),

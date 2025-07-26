@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class LocationDto {
-    private String sido;
+    @JsonProperty("sido")
+    private String si;
+
     private String gu;
     private String dong;
 

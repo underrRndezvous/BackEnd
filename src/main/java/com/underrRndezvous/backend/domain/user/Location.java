@@ -39,7 +39,6 @@ public class Location {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<MeetingUser> meetingUsers = new ArrayList<>();
 
-    // 생성자 (필요에 따라 추가)
     public Location(Long locationId, String si, String gu, String dong,
                     Double latitude, Double longitude) {
         this.locationId = locationId;

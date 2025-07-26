@@ -22,8 +22,10 @@ public class AreaRecommendationController {
     @GetMapping("/recommend/{meetingId}")
     public List<AreaResponse> recommendAreas(
             @PathVariable Long meetingId,
-            @RequestParam(defaultValue = "3") int limit
-    ) {
+            @RequestParam(defaultValue = "3")
+            int limit
+    )
+    {
         log.info("recommendAreas called for meetingId={}, limit={}", meetingId, limit);
         return recommendationService.recommendByMeeting(meetingId, limit);
     }
