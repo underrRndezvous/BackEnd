@@ -2,6 +2,7 @@ package com.underrRndezvous.backend.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +18,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class Location {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "location_id", nullable = false)
     private Long locationId;
 
@@ -39,6 +40,7 @@ public class Location {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<MeetingUser> meetingUsers = new ArrayList<>();
 
+    @Builder
     public Location(Long locationId, String si, String gu, String dong,
                     Double latitude, Double longitude) {
         this.locationId = locationId;
@@ -47,5 +49,17 @@ public class Location {
         this.dong       = dong;
         this.latitude   = latitude;
         this.longitude  = longitude;
+    }
+
+    public static Location of(Long locationId, String si, String gu, String dong,
+                              Double latitude, Double longitude) {
+        return Location.builder()
+                .locationId(locationId)
+                .si(si)
+                .gu(gu)
+                .dong(dong)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 }

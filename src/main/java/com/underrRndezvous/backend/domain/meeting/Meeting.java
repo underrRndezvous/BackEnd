@@ -6,6 +6,7 @@ import com.underrRndezvous.backend.domain.enums.TimeType;
 import com.underrRndezvous.backend.domain.user.MeetingUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,5 +42,21 @@ public class Meeting extends BaseEntity {
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private List<MeetingPlaceCategory> placeCategories = new ArrayList<>();
+
+    @Builder
+    public Meeting(String name, MeetingType category, TimeType meetingTime) {
+        this.name        = name;
+        this.category    = category;
+        this.meetingTime = meetingTime;
+    }
+
+    public static Meeting of(String name, MeetingType category, TimeType meetingTime) {
+        return Meeting.builder()
+                .name(name)
+                .category(category)
+                .meetingTime(meetingTime)
+                .build();
+    }
+
 
 }

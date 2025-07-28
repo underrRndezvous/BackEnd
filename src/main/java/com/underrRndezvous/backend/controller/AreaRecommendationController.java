@@ -26,7 +26,6 @@ public class AreaRecommendationController {
             int limit
     )
     {
-        log.info("recommendAreas called for meetingId={}, limit={}", meetingId, limit);
         return recommendationService.recommendByMeeting(meetingId, limit);
     }
 }
