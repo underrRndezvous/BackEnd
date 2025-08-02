@@ -1,0 +1,58 @@
+[
+  {
+    "name": "이오로 비스트로 성수점",
+    "latitude": 37.54472,
+    "longitude": 127.05466,
+    "placeType": "restaurant",
+    "typeDetail": "japan"
+  },
+  {
+    "name": "온더보더 홍대점",
+    "latitude": 37.55630,
+    "longitude": 126.92311,
+    "placeType": "restaurant",
+    "typeDetail": "mexican"
+  },
+  {
+    "name": "카페 더리버",
+    "latitude": 37.52047,
+    "longitude": 127.02461,
+    "placeType": "cafe",
+    "typeDetail": "coffee"
+  },
+  {
+    "name": "카페 어니언 성수점",
+    "latitude": 37.54491,
+    "longitude": 127.05513,
+    "placeType": "cafe",
+    "typeDetail": "bakery"
+  },
+  {
+    "name": "맥주창고 이태원점",
+    "latitude": 37.53452,
+    "longitude": 126.99427,
+    "placeType": "drinking",
+    "typeDetail": "beer"
+  },
+  {
+    "name": "바 소설",
+    "latitude": 37.54955,
+    "longitude": 127.06525,
+    "placeType": "drinking",
+    "typeDetail": "wine"
+  },
+  {
+    "name": "번지점프 VR 홍대점",
+    "latitude": 37.55601,
+    "longitude": 126.92388,
+    "placeType": "activity",
+    "typeDetail": "vr"
+  },
+  {
+    "name": "방탈출 카페 노잉 강남역점",
+    "latitude": 37.49795,
+    "longitude": 127.02764,
+    "placeType": "activity",
+    "typeDetail": "escape"
+  }
+]

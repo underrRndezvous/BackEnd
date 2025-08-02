@@ -1,9 +1,8 @@
 package com.underrRndezvous.backend.domain.place;
 
+import com.underrRndezvous.backend.domain.enums.PlaceType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -19,17 +18,27 @@ public class Place {
     @Column(name = "place_name", nullable = false)
     private String name;
 
-    @Column(name = "address", nullable = false)
-    private String address;
-
-    @Column(name = "review_count", nullable = false)
+    @Column(name = "review_count")
     private Integer reviewCount;
+
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
+
+    @Column(name = "business_hours")
+    private String businessHours;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "place_type", nullable = false)
+    private PlaceType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private PlaceCategory category;
+    @JoinColumn(name = "sub_category_id")
+    private PlaceSubCategory subCategory;
 }

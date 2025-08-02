@@ -1,5 +1,6 @@
-package com.underrRndezvous.backend.domain.user;
+package com.underrRndezvous.backend.domain.place;
 
+import com.underrRndezvous.backend.domain.meeting.MeetingLocation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,12 +10,10 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "location")
+@Table(name = "locations")
 public class Location {
 
     @Id
@@ -38,7 +37,7 @@ public class Location {
     private Double longitude;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
-    private List<MeetingUser> meetingUsers = new ArrayList<>();
+    private List<MeetingLocation> meetingLocations = new ArrayList<>();
 
     @Builder
     public Location(Long locationId, String si, String gu, String dong,
