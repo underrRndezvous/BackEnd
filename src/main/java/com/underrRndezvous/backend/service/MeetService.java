@@ -10,7 +10,7 @@ import com.underrRndezvous.backend.domain.place.Place;
 import com.underrRndezvous.backend.repository.AreaRepository;
 import com.underrRndezvous.backend.repository.PlaceRepository;
 import com.underrRndezvous.backend.util.DistanceCalculator;
-import com.underrRndezvous.backend.util.Position;
+import com.underrRndezvous.backend.dto.Position;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
@@ -32,7 +32,7 @@ public class MeetService {
                 .collect(Collectors.toList());
 
         // 2) 지구 구면 중간 위치 계산
-        double[] midpoint = placeService.calculateGeographicMidpoint(positions);
+        double[] midpoint = DistanceCalculator.calculateGeographicMidpoint(positions);
         double midLat = midpoint[0];
         double midLng = midpoint[1];
 

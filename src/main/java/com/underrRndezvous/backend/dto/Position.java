@@ -1,4 +1,4 @@
-package com.underrRndezvous.backend.util;
+package com.underrRndezvous.backend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
