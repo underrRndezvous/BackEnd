@@ -52,13 +52,11 @@ public class MeetService {
 
                     List<PlaceRecommendation> recs = req.getPlace().stream()
                             .map(pr -> {
-                                PlaceType type = pr.getPlaceType().equalsIgnoreCase("drinking")
-                                        ? PlaceType.BAR
-                                        : PlaceType.valueOf(pr.getPlaceType().toUpperCase());
+                                PlaceType type = PlaceType.valueOf(pr.getPlaceType().toUpperCase());
+                                String detail = pr.getTypeDetail();
+
                                 // 요청된 서브카테고리별 후보 리스트 조회
-                                List<Place> candidates = placeRepo.findByTypeAndSubCategory_Name(
-                                        type, pr.getTypeDetail()
-                                );
+                                List<Place> candidates = placeRepo.findByTypeAndSubCategory_Name(type, detail);
                                 return candidates.stream()
                                         .min(Comparator.comparingDouble(p ->
                                                 DistanceCalculator.distance(
