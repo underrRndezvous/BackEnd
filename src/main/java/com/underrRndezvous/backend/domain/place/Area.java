@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.underrRndezvous.backend.domain.meeting.MeetingArea;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,8 +23,11 @@ public class Area {
     private Long areaId;
 
     @Column(name = "area_name", nullable = false)
-    @JsonProperty("hotplaceName")
+    // @JsonProperty("hotplaceName")
     private String areaName;
+
+    @Column(name = "area_image")
+    private String areaImage;
 
     @Column(name = "latitude", nullable = false)
     private Double latitude;
@@ -31,19 +35,28 @@ public class Area {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    // @Column(name = "distance") // 보류
-    // private Double distance;
-
-    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingArea> meetingAreas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Place> places = new ArrayList<>();
 
-    public Area(Long areaId, String areaName, Double latitude, Double longitude) {
+    @Builder
+    public Area(Long areaId, String areaName, String areaImage, Double latitude, Double longitude) {
         this.areaId = areaId;
         this.areaName = areaName;
+        this.areaImage = areaImage;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public static Area of(Long areaId, String areaName, String areaImage, Double latitude, Double longitude) {
+        return Area.builder()
+                .areaId(areaId)
+                .areaName(areaName)
+                .areaImage(areaImage)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 }

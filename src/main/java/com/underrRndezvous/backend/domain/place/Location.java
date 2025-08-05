@@ -1,23 +1,23 @@
-package com.underrRndezvous.backend.domain.user;
+package com.underrRndezvous.backend.domain.place;
 
+import com.underrRndezvous.backend.domain.meeting.MeetingLocation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "location")
+@Table(name = "locations")
 public class Location {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "location_id", nullable = false)
     private Long locationId;
 
@@ -37,9 +37,9 @@ public class Location {
     private Double longitude;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
-    private List<MeetingUser> meetingUsers = new ArrayList<>();
+    private List<MeetingLocation> meetingLocations = new ArrayList<>();
 
-    // 생성자 (필요에 따라 추가)
+    @Builder
     public Location(Long locationId, String si, String gu, String dong,
                     Double latitude, Double longitude) {
         this.locationId = locationId;
@@ -48,5 +48,17 @@ public class Location {
         this.dong       = dong;
         this.latitude   = latitude;
         this.longitude  = longitude;
+    }
+
+    public static Location of(Long locationId, String si, String gu, String dong,
+                              Double latitude, Double longitude) {
+        return Location.builder()
+                .locationId(locationId)
+                .si(si)
+                .gu(gu)
+                .dong(dong)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 }
