@@ -1,8 +1,13 @@
 package com.underrRndezvous.backend.domain.place;
 
 import com.underrRndezvous.backend.domain.enums.PlaceType;
+import com.underrRndezvous.backend.domain.enums.CafeAtmosphere;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -27,8 +32,9 @@ public class Place {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @Column(name = "business_hours")
-    private String businessHours;
+    @Convert(converter = BusinessHoursConverter.class)
+    @Column(name = "business_hours", columnDefinition = "JSON")
+    private BusinessHours businessHours;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "place_type", nullable = false)
@@ -41,4 +47,24 @@ public class Place {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_category_id")
     private PlaceSubCategory subCategory;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cafe_atmosphere")
+    private CafeAtmosphere cafeAtmosphere;
+    
+    public boolean isOpenAt(LocalDateTime dateTime) {
+        return businessHours != null && businessHours.isOpenAt(dateTime);
+    }
+    
+    public boolean isOpenNow() {
+        return isOpenAt(LocalDateTime.now());
+    }
+    
+    public boolean isOpenDuring(LocalTime startTime, LocalTime endTime, DayOfWeek dayOfWeek) {
+        return businessHours != null && businessHours.isOpenDuring(startTime, endTime, dayOfWeek);
+    }
+    
+    public DaySchedule getTodaySchedule() {
+        return businessHours != null ? businessHours.getScheduleForDay(LocalDateTime.now().getDayOfWeek()) : null;
+    }
 }

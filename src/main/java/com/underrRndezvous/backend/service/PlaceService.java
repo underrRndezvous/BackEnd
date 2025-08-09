@@ -37,7 +37,7 @@ public class PlaceService {
                 0.0, // 평점은 임의로 0점
                 place.getReviewCount(),
                 place.getArea().getAreaName(),
-                place.getBusinessHours(),
+                place.getBusinessHours() != null ? place.getBusinessHours().toString() : "",
                 "" // 이미지
         );
     }

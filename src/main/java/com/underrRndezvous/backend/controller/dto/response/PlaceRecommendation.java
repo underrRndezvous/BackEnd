@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class PlaceRecommendation {
     private int order;
     private Long storeId;
+    private String category;
     private String storeName;
     private Double placelati;
     private Double placelong;
