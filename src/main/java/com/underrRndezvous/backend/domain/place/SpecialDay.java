@@ -16,7 +16,6 @@ public class SpecialDay {
     
     private LocalDate date;
     private boolean closed;
-    private String reason;
     private LocalTime open;
     private LocalTime close;
     private String note;

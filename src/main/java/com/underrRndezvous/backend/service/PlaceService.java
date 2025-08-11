@@ -19,8 +19,8 @@ public class PlaceService {
 
     // 행정동 -> 위도, 경도
     public Position getPositionFromArea(String si, String gu, String dong) {
-        Location location = locationRepo.findBySiAndGuAndDong(si, gu, dong)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown area"));
+        Location location = locationRepo.findFirstBySiAndGuAndDong(si, gu, dong)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown area: " + si + ", " + gu + ", " + dong));
         return new Position(location.getLatitude(), location.getLongitude());
     }
 
@@ -32,7 +32,7 @@ public class PlaceService {
         return new PlaceDetailResponse(
                 place.getId(),
                 place.getType().name().toLowerCase(),
-                place.getSubCategory().getName(),
+                place.getSubCategoryName(),
                 place.getName(),
                 0.0, // 평점은 임의로 0점
                 place.getReviewCount(),

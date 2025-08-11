@@ -1,7 +1,6 @@
 package com.underrRndezvous.backend.domain.place;
 
 import com.underrRndezvous.backend.domain.enums.PlaceType;
-import com.underrRndezvous.backend.domain.enums.CafeAtmosphere;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +15,6 @@ import java.time.LocalTime;
 public class Place {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_id")
     private Long id;
 
@@ -32,6 +30,10 @@ public class Place {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
+    @Column(name = "atmosphere")
+    private String atmosphere;
+
+
     @Convert(converter = BusinessHoursConverter.class)
     @Column(name = "business_hours", columnDefinition = "JSON")
     private BusinessHours businessHours;
@@ -44,13 +46,8 @@ public class Place {
     @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sub_category_id")
-    private PlaceSubCategory subCategory;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "cafe_atmosphere")
-    private CafeAtmosphere cafeAtmosphere;
+    @Column(name = "sub_category_name")
+    private String subCategoryName;
     
     public boolean isOpenAt(LocalDateTime dateTime) {
         return businessHours != null && businessHours.isOpenAt(dateTime);
@@ -58,13 +55,46 @@ public class Place {
     
     public boolean isOpenNow() {
         return isOpenAt(LocalDateTime.now());
+
     }
-    
     public boolean isOpenDuring(LocalTime startTime, LocalTime endTime, DayOfWeek dayOfWeek) {
         return businessHours != null && businessHours.isOpenDuring(startTime, endTime, dayOfWeek);
     }
     
     public DaySchedule getTodaySchedule() {
         return businessHours != null ? businessHours.getScheduleForDay(LocalDateTime.now().getDayOfWeek()) : null;
+    }
+
+    @Builder
+    public Place(Long id, String name, Integer reviewCount, Double latitude, Double longitude, 
+                 String atmosphere, BusinessHours businessHours, PlaceType type, 
+                 Area area, String subCategoryName) {
+        this.id = id;
+        this.name = name;
+        this.reviewCount = reviewCount;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.atmosphere = atmosphere;
+        this.businessHours = businessHours;
+        this.type = type;
+        this.area = area;
+        this.subCategoryName = subCategoryName;
+    }
+
+    public static Place of(Long id, String name, Integer reviewCount, Double latitude, Double longitude,
+                          String atmosphere, BusinessHours businessHours, PlaceType type,
+                          Area area, String subCategoryName) {
+        return Place.builder()
+                .id(id)
+                .name(name)
+                .reviewCount(reviewCount)
+                .latitude(latitude)
+                .longitude(longitude)
+                .atmosphere(atmosphere)
+                .businessHours(businessHours)
+                .type(type)
+                .area(area)
+                .subCategoryName(subCategoryName)
+                .build();
     }
 }

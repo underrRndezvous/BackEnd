@@ -15,7 +15,6 @@ import java.util.List;
 public class DaySchedule {
     
     private boolean closed;
-    private String reason;
     private LocalTime open;
     private LocalTime close;
     private LocalTime lastOrder;

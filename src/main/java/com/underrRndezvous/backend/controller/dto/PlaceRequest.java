@@ -9,5 +9,5 @@ public class PlaceRequest {
     private int id;
     private String placeType;
     private String typeDetail;
-    private String cafeAtmosphere;
+    private String atmosphere;
 }

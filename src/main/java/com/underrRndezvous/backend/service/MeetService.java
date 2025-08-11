@@ -7,7 +7,8 @@ import com.underrRndezvous.backend.controller.dto.response.PlaceRecommendation;
 import com.underrRndezvous.backend.controller.dto.response.RegionRecommendation;
 import com.underrRndezvous.backend.domain.enums.AreaGroup;
 import com.underrRndezvous.backend.domain.enums.PlaceType;
-import com.underrRndezvous.backend.domain.enums.CafeAtmosphere;
+import com.underrRndezvous.backend.domain.enums.TimeType;
+import com.underrRndezvous.backend.domain.enums.DayType;
 import com.underrRndezvous.backend.domain.place.Area;
 import com.underrRndezvous.backend.domain.place.Place;
 import com.underrRndezvous.backend.repository.AreaRepository;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -44,20 +46,50 @@ public class MeetService {
         // 3) 그룹별 가장 가까운 대표 지역 조회 -> 상위 1개 그룹의 모든 지역 선택
         List<Area> nearestAreas = findNearestAreasByGroup(midLat, midLng);
 
-        // 4) 각 지역별로 요청된 서브카테고리별 가게 추천
-        List<RegionRecommendation> regions = nearestAreas.stream()
+        // 4) 각 지역별로 요청된 서브카테고리별 가게 추천 (지역명 기준 중복 제거)
+        Map<String, RegionRecommendation> regionMap = nearestAreas.stream()
                 .map(area -> createRegionRecommendation(area, req))
-                .toList();
+                .collect(Collectors.toMap(
+                    RegionRecommendation::getHotPlace, // 지역명을 키로 사용
+                    Function.identity(), // 값은 RegionRecommendation 자체
+                    (existing, replacement) -> { // 중복시 기존 것에 추가
+                        List<PlaceRecommendation> combined = new ArrayList<>(existing.getRecommendPlace());
+                        combined.addAll(replacement.getRecommendPlace());
+                        return new RegionRecommendation(existing.getHotPlace(), existing.getHotPlaceImage(), combined);
+                    }
+                ));
+        
+        List<RegionRecommendation> regions = regionMap.values().stream()
+                .map(this::removeDuplicateStores) // 각 지역별로 중복 상점 제거
+                .filter(region -> !region.getRecommendPlace().isEmpty()) // 빈 추천 제거
+                .limit(3) // 최대 3개 지역
+                .collect(Collectors.toList());
 
         return new MeetResponse(regions);
     }
 
+    private RegionRecommendation removeDuplicateStores(RegionRecommendation region) {
+        List<PlaceRecommendation> uniquePlaces = region.getRecommendPlace().stream()
+                .collect(Collectors.toMap(
+                        PlaceRecommendation::getStoreId, // storeId를 키로 사용
+                        Function.identity(), // 값은 PlaceRecommendation 자체
+                        (existing, replacement) -> existing // 중복시 기존 것 유지
+                ))
+                .values()
+                .stream()
+                .sorted(Comparator.comparingInt(PlaceRecommendation::getOrder))
+                .collect(Collectors.toList());
+                
+        return new RegionRecommendation(region.getHotPlace(), region.getHotPlaceImage(), uniquePlaces);
+    }
+
     private RegionRecommendation createRegionRecommendation(Area area, MeetRequest req) {
         String hotPlace = area.getAreaName();
-        String imageUrl = "https://ncloud.s3.com/" + hotPlace + ".jpg";
+        String imageUrl = area.getAreaImage();
         
-        // 모임 시간 파싱
-        LocalTime meetTime = parseMeetTime(req.getMeetTime());
+        // 모임 시간 파싱 - 시간대별 구분
+        // 오전: 04:00-11:00, 점심: 11:00-13:59, 오후: 14:00-17:59, 저녁: 18:00-04:00
+        LocalTime meetTime = parseMeetTimeWithTimeZone(req.getMeetTime());
         DayOfWeek meetDay = parseMeetDay(req.getMeetDays());
         
         List<PlaceRecommendation> placeRecommendations = req.getPlace().stream()
@@ -74,15 +106,15 @@ public class MeetService {
         
         List<Place> candidates;
         
-        // 카페인 경우 분위기 필터링 적용
-        if (type == PlaceType.CAFE && placeRequest.getCafeAtmosphere() != null) {
-            CafeAtmosphere atmosphere = CafeAtmosphere.valueOf(placeRequest.getCafeAtmosphere().toUpperCase());
-            candidates = placeRepo.findByAreaAreaIdAndTypeAndSubCategoryNameAndCafeAtmosphere(area.getAreaId(), type, detail, atmosphere);
+        // 카페인 경우 분위기 필터링 적용 (부분 일치 검색)
+        if (type == PlaceType.CAFE && placeRequest.getAtmosphere() != null) {
+            String atmosphere = placeRequest.getAtmosphere();
+            candidates = placeRepo.findByAreaAreaIdAndTypeAndAtmosphereContaining(area.getAreaId(), type, atmosphere);
         } else {
-            candidates = placeRepo.findByAreaAreaIdAndTypeAndSubCategoryName(area.getAreaId(), type, detail);
+            candidates = placeRepo.findByAreaAreaIdAndType(area.getAreaId(), type);
         }
         
-        // 영업시간 필터링 적용
+        // 영업시간 필터링 적용 (현재 영업중인 가게만)
         List<Place> filteredCandidates = candidates.stream()
                 .filter(place -> isOpenDuringMeetTime(place, meetTime, meetDay))
                 .collect(Collectors.toList());
@@ -91,18 +123,39 @@ public class MeetService {
         List<Place> shuffledCandidates = new ArrayList<>(filteredCandidates);
         Collections.shuffle(shuffledCandidates);
         
-        // 최대 1개만 선택
-        return shuffledCandidates.stream()
-                .limit(1)
-                .map(place -> new PlaceRecommendation(
-                        placeRequest.getId(),
-                        place.getId(),
-                        place.getSubCategory().getName(),
-                        place.getName(),
-                        place.getLatitude(),
-                        place.getLongitude()
-                ))
-                .collect(Collectors.toList());
+        // 첫 번째 장소 선택
+        List<PlaceRecommendation> recommendations = new ArrayList<>();
+
+        if (!shuffledCandidates.isEmpty()) {
+            Place firstPlace = shuffledCandidates.get(0);
+            boolean firstPlaceIsOpen = isOpenDuringMeetTime(firstPlace, meetTime, meetDay);
+
+            // 첫 번째 장소 추가
+            recommendations.add(createPlaceRecommendation(placeRequest, firstPlace, firstPlaceIsOpen));
+
+            // 첫 번째 장소가 닫혀있으면 열린 대안 찾기
+            if (!firstPlaceIsOpen) {
+                shuffledCandidates.stream()
+                    .skip(1)
+                    .filter(place -> isOpenDuringMeetTime(place, meetTime, meetDay))
+                    .findFirst()
+                    .ifPresent(place -> recommendations.add(createPlaceRecommendation(placeRequest, place, true)));
+            }
+        }
+        
+        return recommendations;
+    }
+
+    private PlaceRecommendation createPlaceRecommendation(PlaceRequest placeRequest, Place place, boolean isOpen) {
+        return new PlaceRecommendation(
+                placeRequest.getId(),
+                place.getId(),
+                place.getType().toString(),
+                place.getName(),
+                place.getLatitude(),
+                place.getLongitude(),
+                isOpen
+        );
     }
 
     private List<Area> findNearestAreasByGroup(double midLat, double midLng) {
@@ -121,6 +174,7 @@ public class MeetService {
         
         return allAreas.stream()
                 .filter(area -> nearestGroupNames.contains(area.getAreaName()))
+                .limit(3) // 최대 3개 지역만 선택
                 .collect(Collectors.toList());
     }
 
@@ -133,6 +187,32 @@ public class MeetService {
                 .orElse(null);
     }
 
+    // 시간대별 시간 객체 생성 메서드
+    private LocalTime parseMeetTimeWithTimeZone(TimeType timeType) {
+        if (timeType == null) {
+            return LocalTime.of(12, 0); // 기본값: 12:00 (점심)
+        }
+        
+        // TimeType enum에 따른 기본 시간 설정
+        switch (timeType) {
+            case MORNING -> {
+                return LocalTime.of(9, 0); // 오전 9:00
+            }
+            case LUNCH -> {
+                return LocalTime.of(12, 0); // 점심 12:00
+            }
+            case AFTERNOON -> {
+                return LocalTime.of(15, 0); // 오후 3:00
+            }
+            case EVENING -> {
+                return LocalTime.of(19, 0); // 저녁 7:00
+            }
+            default -> {
+                return LocalTime.of(12, 0); // 기본값
+            }
+        }
+    }
+    
     // 시간 문자열 파싱 메서드들
     private LocalTime parseMeetTime(String meetTime) {
         if (meetTime == null || meetTime.trim().isEmpty()) {
@@ -150,21 +230,43 @@ public class MeetService {
         }
     }
 
-    private DayOfWeek parseMeetDay(String meetDays) {
-        if (meetDays == null || meetDays.trim().isEmpty()) {
+    private DayOfWeek parseMeetDay(DayType dayType) {
+        if (dayType == null) {
             return DayOfWeek.SATURDAY; // 기본값: 토요일
         }
         
-        String day = meetDays.trim().toUpperCase();
-        switch (day) {
-            case "월요일", "월", "MONDAY": return DayOfWeek.MONDAY;
-            case "화요일", "화", "TUESDAY": return DayOfWeek.TUESDAY; 
-            case "수요일", "수", "WEDNESDAY": return DayOfWeek.WEDNESDAY;
-            case "목요일", "목", "THURSDAY": return DayOfWeek.THURSDAY;
-            case "금요일", "금", "FRIDAY": return DayOfWeek.FRIDAY;
-            case "토요일", "토", "SATURDAY": return DayOfWeek.SATURDAY;
-            case "일요일", "일", "SUNDAY": return DayOfWeek.SUNDAY;
-            default: return DayOfWeek.SATURDAY; // 기본값
+        // DayType enum에 따른 DayOfWeek 매핑
+        switch (dayType) {
+            case MONDAY -> {
+                return DayOfWeek.MONDAY;
+            }
+            case TUESDAY -> {
+                return DayOfWeek.TUESDAY;
+            }
+            case WEDNESDAY -> {
+                return DayOfWeek.WEDNESDAY;
+            }
+            case THURSDAY -> {
+                return DayOfWeek.THURSDAY;
+            }
+            case FRIDAY -> {
+                return DayOfWeek.FRIDAY;
+            }
+            case SATURDAY -> {
+                return DayOfWeek.SATURDAY;
+            }
+            case SUNDAY -> {
+                return DayOfWeek.SUNDAY;
+            }
+            case WEEKDAY -> {
+                return DayOfWeek.FRIDAY; // 평일 대표로 금요일
+            }
+            case WEEKEND -> {
+                return DayOfWeek.SATURDAY; // 주말 대표로 토요일
+            }
+            default -> {
+                return DayOfWeek.SATURDAY; // 기본값
+            }
         }
     }
 

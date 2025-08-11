@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+README.md
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Test files
+src/test/
+
+# CSV and data files
+*.csv
+src/main/resources/dump.sql
+*.json
+!src/main/resources/**/*.json
+
+# API test files
+*.http
+
+# Temporary files
+*.tmp
+*.temp

@@ -15,4 +15,5 @@ public class PlaceRecommendation {
     private String storeName;
     private Double placelati;
     private Double placelong;
+    private boolean isOpen;
 }
