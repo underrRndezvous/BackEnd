@@ -89,18 +89,18 @@ public class MeetService {
         
         // 모임 시간 파싱 - 시간대별 구분
         // 오전: 04:00-11:00, 점심: 11:00-13:59, 오후: 14:00-17:59, 저녁: 18:00-04:00
-        LocalTime meetTime = parseMeetTimeWithTimeZone(req.getMeetTime());
+        List<LocalTime> meetTimes = parseMeetTimesWithTimeZone(req.getMeetTime());
         DayOfWeek meetDay = parseMeetDay(req.getMeetDays());
         
         List<PlaceRecommendation> placeRecommendations = req.getPlace().stream()
-                .flatMap(placeRequest -> findRandomPlaces(placeRequest, area, meetTime, meetDay).stream())
+                .flatMap(placeRequest -> findRandomPlaces(placeRequest, area, meetTimes, meetDay).stream())
                 .sorted(Comparator.comparingInt(PlaceRecommendation::getOrder))
                 .collect(Collectors.toList());
         
         return new RegionRecommendation(hotPlace, imageUrl, placeRecommendations);
     }
 
-    private List<PlaceRecommendation> findRandomPlaces(PlaceRequest placeRequest, Area area, LocalTime meetTime, DayOfWeek meetDay) {
+    private List<PlaceRecommendation> findRandomPlaces(PlaceRequest placeRequest, Area area, List<LocalTime> meetTimes, DayOfWeek meetDay) {
         PlaceType type = PlaceType.valueOf(placeRequest.getPlaceType().toUpperCase());
         String detail = placeRequest.getTypeDetail();
         
@@ -114,9 +114,9 @@ public class MeetService {
             candidates = placeRepo.findByAreaAreaIdAndType(area.getAreaId(), type);
         }
         
-        // 영업시간 필터링 적용 (현재 영업중인 가게만)
+        // 영업시간 필터링 적용 (모든 모임 시간에 영업중인 가게만)
         List<Place> filteredCandidates = candidates.stream()
-                .filter(place -> isOpenDuringMeetTime(place, meetTime, meetDay))
+                .filter(place -> meetTimes.stream().allMatch(meetTime -> isOpenDuringMeetTime(place, meetTime, meetDay)))
                 .collect(Collectors.toList());
         
         // 랜덤 순서로 섞기
@@ -128,7 +128,7 @@ public class MeetService {
 
         if (!shuffledCandidates.isEmpty()) {
             Place firstPlace = shuffledCandidates.get(0);
-            boolean firstPlaceIsOpen = isOpenDuringMeetTime(firstPlace, meetTime, meetDay);
+            boolean firstPlaceIsOpen = meetTimes.stream().allMatch(meetTime -> isOpenDuringMeetTime(firstPlace, meetTime, meetDay));
 
             // 첫 번째 장소 추가
             recommendations.add(createPlaceRecommendation(placeRequest, firstPlace, firstPlaceIsOpen));
@@ -137,7 +137,7 @@ public class MeetService {
             if (!firstPlaceIsOpen) {
                 shuffledCandidates.stream()
                     .skip(1)
-                    .filter(place -> isOpenDuringMeetTime(place, meetTime, meetDay))
+                    .filter(place -> meetTimes.stream().allMatch(meetTime -> isOpenDuringMeetTime(place, meetTime, meetDay)))
                     .findFirst()
                     .ifPresent(place -> recommendations.add(createPlaceRecommendation(placeRequest, place, true)));
             }
@@ -187,6 +187,17 @@ public class MeetService {
                 .orElse(null);
     }
 
+    // 시간대별 시간 객체 생성 메서드 (여러 시간 지원)
+    private List<LocalTime> parseMeetTimesWithTimeZone(List<TimeType> timeTypes) {
+        if (timeTypes == null || timeTypes.isEmpty()) {
+            return Arrays.asList(LocalTime.of(12, 0)); // 기본값: 12:00 (점심)
+        }
+        
+        return timeTypes.stream()
+                .map(this::parseMeetTimeWithTimeZone)
+                .collect(Collectors.toList());
+    }
+    
     // 시간대별 시간 객체 생성 메서드
     private LocalTime parseMeetTimeWithTimeZone(TimeType timeType) {
         if (timeType == null) {

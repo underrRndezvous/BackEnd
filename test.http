@@ -1,2 +1,490 @@
-### GET request to example server
-GET https://www.naver.com
+### 1. 기본 케이스 - 금요일 저녁 모임 (강남)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "친구모임",
+  "meetTime": ["EVENING"],
+  "meetDays": "FRIDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "역삼1동"
+    }
+  ]
+}
+
+### 2. 점심시간 모임 - 홍대 (다중 출발지)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "회사동료모임",
+  "meetTime": ["LUNCH"],
+  "meetDays": "TUESDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "SOCIABLE"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "마포구",
+      "third": "서교동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "마포구",
+      "third": "합정동"
+    }
+  ]
+}
+
+### 3. 주말 아침 모임 - 이태원 (바와 카페)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "주말모임",
+  "meetTime": ["MORNING"],
+  "meetDays": "SATURDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "AESTHETIC"
+    },
+    {
+      "id": 2,
+      "placeType": "BAR",
+      "typeDetail": null,
+      "atmosphere": null
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "용산구",
+      "third": "이태원제1동"
+    }
+  ]
+}
+
+### 4. 오후 모임 - 신촌 (카페만)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "스터디모임",
+  "meetTime": ["AFTERNOON"],
+  "meetDays": "WEDNESDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "서대문구",
+      "third": "신촌동"
+    }
+  ]
+}
+
+### 4-1. 오후 모임 - 신촌 (카페, 2가지 분위기 조합)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "카페투어모임",
+  "meetTime": ["AFTERNOON"],
+  "meetDays": "WEDNESDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE, AESTHETIC"
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "SOCIABLE, INDULGENT"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "서대문구",
+      "third": "신촌동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "마포구",
+      "third": "연남동"
+    }
+  ]
+}
+
+### 5. 평일 저녁 - 건대 (모든 타입)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "대학동기모임",
+  "meetTime": ["EVENING"],
+  "meetDays": "WEEKDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "SOCIABLE"
+    },
+    {
+      "id": 3,
+      "placeType": "BAR",
+      "typeDetail": null,
+      "atmosphere": null
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "광진구",
+      "third": "자양제1동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "광진구",
+      "third": "화양동"
+    }
+  ]
+}
+
+### 6. 주말 저녁 - 잠실 (3명 출발지)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "가족모임",
+  "meetTime": ["EVENING"],
+  "meetDays": "WEEKEND",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "송파구",
+      "third": "잠실3동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "송파구",
+      "third": "잠실6동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "삼성1동"
+    }
+  ]
+}
+
+### 7. 아침 모임 - 종로 (카페, 레스토랑)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "조기모임",
+  "meetTime": ["MORNING"],
+  "meetDays": "SUNDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE"
+    },
+    {
+      "id": 2,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "종로구",
+      "third": "종로1가"
+    }
+  ]
+}
+
+### 8. 점심 모임 - 명동 (단일 출발지)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "관광모임",
+  "meetTime": ["LUNCH"],
+  "meetDays": "SATURDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "AESTHETIC"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "중구",
+      "third": "명동"
+    }
+  ]
+}
+
+### 9. 새벽 모임 - 강남 (닫힌 가게 예제)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "새벽모임",
+  "meetTime": ["MORNING"],
+  "meetDays": "MONDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE"
+    },
+    {
+      "id": 3,
+      "placeType": "BAR",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 4,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 5,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE"
+    },
+    {
+      "id": 6,
+      "placeType": "BAR",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 7,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 8,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "SOCIABLE"
+    },
+    {
+      "id": 9,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 10,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "AESTHETIC"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "논현1동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "논현2동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "신사동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "압구정동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "청담동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "삼성1동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "대치1동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "역삼1동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "도곡1동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "서초구",
+      "third": "서초1동"
+    }
+  ]
+}
+
+### 10. 다중 시간 모임 - 강남 (점심+오후)
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "긴시간모임",
+  "meetTime": ["LUNCH", "AFTERNOON"],
+  "meetDays": "SATURDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "RESTAURANT",
+      "typeDetail": null,
+      "atmosphere": null
+    },
+    {
+      "id": 2,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "SOCIABLE"
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "강남구",
+      "third": "역삼1동"
+    }
+  ]
+}
+
+### 11. 다중 시간 모임 - 홍대 (오전+저녁)  
+POST https://swp.hoydev.com/meet
+Content-Type: application/json
+
+{
+  "groupName": "장시간모임",
+  "meetTime": ["MORNING", "EVENING"],
+  "meetDays": "SUNDAY",
+  "place": [
+    {
+      "id": 1,
+      "placeType": "CAFE",
+      "typeDetail": null,
+      "atmosphere": "PRODUCTIVE"
+    },
+    {
+      "id": 2,
+      "placeType": "BAR",
+      "typeDetail": null,
+      "atmosphere": null
+    }
+  ],
+  "startPoint": [
+    {
+      "first": "서울특별시",
+      "second": "마포구",
+      "third": "서교동"
+    },
+    {
+      "first": "서울특별시",
+      "second": "마포구",
+      "third": "합정동"
+    }
+  ]
+}
+
+###
