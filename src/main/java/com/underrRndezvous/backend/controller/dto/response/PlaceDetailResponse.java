@@ -15,4 +15,5 @@ public class PlaceDetailResponse {
     private String address;
     private String businessHours;
     private String image;
+    private String subCategory;
 }

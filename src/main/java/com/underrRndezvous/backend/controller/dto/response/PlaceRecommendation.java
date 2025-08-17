@@ -16,4 +16,6 @@ public class PlaceRecommendation {
     private Double placelati;
     private Double placelong;
     private boolean isOpen;
+    private String address;
+    private String subCategory;
 }

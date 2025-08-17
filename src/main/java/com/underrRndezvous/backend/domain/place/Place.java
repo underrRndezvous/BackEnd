@@ -48,6 +48,9 @@ public class Place {
 
     @Column(name = "sub_category_name")
     private String subCategoryName;
+
+    @Column(name = "address")
+    private String address;
     
     public boolean isOpenAt(LocalDateTime dateTime) {
         return businessHours != null && businessHours.isOpenAt(dateTime);
@@ -68,7 +71,7 @@ public class Place {
     @Builder
     public Place(Long id, String name, Integer reviewCount, Double latitude, Double longitude, 
                  String atmosphere, BusinessHours businessHours, PlaceType type, 
-                 Area area, String subCategoryName) {
+                 Area area, String subCategoryName, String address) {
         this.id = id;
         this.name = name;
         this.reviewCount = reviewCount;
@@ -79,11 +82,12 @@ public class Place {
         this.type = type;
         this.area = area;
         this.subCategoryName = subCategoryName;
+        this.address = address;
     }
 
     public static Place of(Long id, String name, Integer reviewCount, Double latitude, Double longitude,
                           String atmosphere, BusinessHours businessHours, PlaceType type,
-                          Area area, String subCategoryName) {
+                          Area area, String subCategoryName, String address) {
         return Place.builder()
                 .id(id)
                 .name(name)
@@ -95,6 +99,7 @@ public class Place {
                 .type(type)
                 .area(area)
                 .subCategoryName(subCategoryName)
+                .address(address)
                 .build();
     }
 }

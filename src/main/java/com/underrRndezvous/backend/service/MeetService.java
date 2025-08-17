@@ -110,7 +110,12 @@ public class MeetService {
         if (type == PlaceType.CAFE && placeRequest.getAtmosphere() != null) {
             String atmosphere = placeRequest.getAtmosphere();
             candidates = placeRepo.findByAreaAreaIdAndTypeAndAtmosphereContaining(area.getAreaId(), type, atmosphere);
-        } else {
+        }
+        // 레스토랑과 바인 경우 서브카테고리 필터링 적용
+        else if ((type == PlaceType.RESTAURANT || type == PlaceType.BAR) && detail != null) {
+            candidates = placeRepo.findByAreaAreaIdAndTypeAndSubCategoryName(area.getAreaId(), type, detail);
+        }
+        else {
             candidates = placeRepo.findByAreaAreaIdAndType(area.getAreaId(), type);
         }
         
@@ -154,7 +159,9 @@ public class MeetService {
                 place.getName(),
                 place.getLatitude(),
                 place.getLongitude(),
-                isOpen
+                isOpen,
+                place.getAddress(),
+                place.getSubCategoryName()
         );
     }
 
