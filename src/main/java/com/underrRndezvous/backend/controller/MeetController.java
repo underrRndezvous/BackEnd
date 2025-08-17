@@ -22,6 +22,21 @@ public class MeetController {
         return ResponseEntity.ok(service.recommend(req));
     }
 
+    @PostMapping("/save")
+    public ResponseEntity<Long> saveRecommendation(
+            @RequestBody MeetRequest req,
+            @RequestParam("userId") Long userId) {
+        Long meetingId = service.saveMeetingWithRecommendation(req, userId);
+        return ResponseEntity.ok(meetingId);
+    }
+
+    @GetMapping("/{meetingId}")
+    public ResponseEntity<MeetResponse> getRecommendation(
+            @PathVariable("meetingId") Long meetingId) {
+        MeetResponse response = service.getMeetingRecommendation(meetingId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/store/detail")
     public ResponseEntity<PlaceDetailResponse> getStoreDetail(
             @RequestParam("storeId") Long storeId) {

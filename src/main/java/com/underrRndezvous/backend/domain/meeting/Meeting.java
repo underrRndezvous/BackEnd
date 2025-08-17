@@ -8,6 +8,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +38,7 @@ public class Meeting extends BaseEntity {
     private TimeType meetingTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
@@ -47,12 +50,24 @@ public class Meeting extends BaseEntity {
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private List<MeetingPlaceSubCategory> meetingPlaceSubCategories = new ArrayList<>();
 
+    @Column(name = "recommendation_result", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Setter
+    private String recommendationResult;
+
     @Builder
     public Meeting(String name, MeetingType category, TimeType meetingTime, User user) {
         this.name = name;
         this.category = category;
         this.meetingTime = meetingTime;
         this.user = user;
+    }
+    
+    public Meeting(String name, MeetingType category, TimeType meetingTime) {
+        this.name = name;
+        this.category = category;
+        this.meetingTime = meetingTime;
+        this.user = null;
     }
 
     public static Meeting of(String name, MeetingType category, TimeType meetingTime, User user) {

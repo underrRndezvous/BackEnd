@@ -1,22 +1,29 @@
 package com.underrRndezvous.backend.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.underrRndezvous.backend.controller.dto.MeetRequest;
 import com.underrRndezvous.backend.controller.dto.PlaceRequest;
 import com.underrRndezvous.backend.controller.dto.response.MeetResponse;
 import com.underrRndezvous.backend.controller.dto.response.PlaceRecommendation;
 import com.underrRndezvous.backend.controller.dto.response.RegionRecommendation;
 import com.underrRndezvous.backend.domain.enums.AreaGroup;
+import com.underrRndezvous.backend.domain.enums.MeetingType;
 import com.underrRndezvous.backend.domain.enums.PlaceType;
 import com.underrRndezvous.backend.domain.enums.TimeType;
 import com.underrRndezvous.backend.domain.enums.DayType;
+import com.underrRndezvous.backend.domain.meeting.Meeting;
+import com.underrRndezvous.backend.domain.meeting.User;
 import com.underrRndezvous.backend.domain.place.Area;
 import com.underrRndezvous.backend.domain.place.Place;
 import com.underrRndezvous.backend.repository.AreaRepository;
+import com.underrRndezvous.backend.repository.MeetingRepository;
 import com.underrRndezvous.backend.repository.PlaceRepository;
+import com.underrRndezvous.backend.repository.UserRepository;
 import com.underrRndezvous.backend.util.DistanceCalculator;
 import com.underrRndezvous.backend.dto.Position;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -31,7 +38,11 @@ public class MeetService {
     private final PlaceService placeService;
     private final PlaceRepository placeRepo;
     private final AreaRepository areaRepo;
+    private final MeetingRepository meetingRepo;
+    private final UserRepository userRepo;
+    private final ObjectMapper objectMapper;
 
+    @Transactional
     public MeetResponse recommend(MeetRequest req) {
         // 1) 참여자 출발지 -> 위도, 경도 좌표
         List<Position> positions = req.getStartPoint().stream()
@@ -65,7 +76,77 @@ public class MeetService {
                 .limit(3) // 최대 3개 지역
                 .collect(Collectors.toList());
 
-        return new MeetResponse(regions);
+        // 5) 추천 결과 자동 저장 (사용자 없이)
+        TimeType timeType = req.getMeetTime() != null && !req.getMeetTime().isEmpty() 
+                ? req.getMeetTime().get(0) 
+                : TimeType.LUNCH;
+        
+        Meeting meeting = new Meeting(
+                req.getGroupName() != null ? req.getGroupName() : "추천 모임",
+                MeetingType.FRIENDS,
+                timeType
+        );
+        
+        Meeting savedMeeting = meetingRepo.save(meeting);
+        
+        // meeting ID가 포함된 response 생성 및 JSON 저장
+        MeetResponse response = new MeetResponse(savedMeeting.getMeetingId(), regions);
+        String responseJson;
+        try {
+            responseJson = objectMapper.writeValueAsString(response);
+        } catch (Exception e) {
+            responseJson = "{}";
+        }
+        savedMeeting.setRecommendationResult(responseJson);
+        meetingRepo.save(savedMeeting);
+        
+        return response;
+    }
+
+    public Long saveMeetingWithRecommendation(MeetRequest req, Long userId) {
+        try {
+            MeetResponse response = recommend(req);
+            
+            User user = userRepo.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+            
+            TimeType timeType = req.getMeetTime() != null && !req.getMeetTime().isEmpty() 
+                    ? req.getMeetTime().get(0) 
+                    : TimeType.LUNCH;
+            
+            Meeting meeting = Meeting.builder()
+                    .name(req.getGroupName())
+                    .category(MeetingType.FRIENDS)
+                    .meetingTime(timeType)
+                    .user(user)
+                    .build();
+            
+            String responseJson = objectMapper.writeValueAsString(response);
+            meeting.setRecommendationResult(responseJson);
+            
+            Meeting savedMeeting = meetingRepo.save(meeting);
+            return savedMeeting.getMeetingId();
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save meeting recommendation", e);
+        }
+    }
+
+    public MeetResponse getMeetingRecommendation(Long meetingId) {
+        try {
+            Meeting meeting = meetingRepo.findByMeetingId(meetingId)
+                    .orElseThrow(() -> new RuntimeException("Meeting not found: " + meetingId));
+            
+            if (meeting.getRecommendationResult() == null) {
+                throw new RuntimeException("No recommendation found for meeting: " + meetingId);
+            }
+            
+            MeetResponse response = objectMapper.readValue(meeting.getRecommendationResult(), MeetResponse.class);
+            return new MeetResponse(meetingId, response.getRegions());
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get meeting recommendation", e);
+        }
     }
 
     private RegionRecommendation removeDuplicateStores(RegionRecommendation region) {
