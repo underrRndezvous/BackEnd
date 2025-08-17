@@ -89,18 +89,19 @@ public class MeetService {
         
         Meeting savedMeeting = meetingRepo.save(meeting);
         
-        // meeting ID가 포함된 response 생성 및 JSON 저장
-        MeetResponse response = new MeetResponse(savedMeeting.getMeetingId(), regions);
+        // regions만 포함된 임시 response로 JSON 저장 (meetingId 없이)
+        MeetResponse tempResponse = new MeetResponse(regions);
         String responseJson;
         try {
-            responseJson = objectMapper.writeValueAsString(response);
+            responseJson = objectMapper.writeValueAsString(tempResponse);
         } catch (Exception e) {
             responseJson = "{}";
         }
         savedMeeting.setRecommendationResult(responseJson);
         meetingRepo.save(savedMeeting);
         
-        return response;
+        // meeting ID가 포함된 최종 response 반환
+        return new MeetResponse(savedMeeting.getMeetingId(), regions);
     }
 
     public Long saveMeetingWithRecommendation(MeetRequest req, Long userId) {
@@ -133,19 +134,25 @@ public class MeetService {
     }
 
     public MeetResponse getMeetingRecommendation(Long meetingId) {
+        Meeting meeting = meetingRepo.findByMeetingId(meetingId)
+                .orElseThrow(() -> new RuntimeException("Meeting not found with ID: " + meetingId));
+        
+        if (meeting.getRecommendationResult() == null) {
+            throw new RuntimeException("No recommendation data found for meeting ID: " + meetingId);
+        }
+
+        System.out.println("meeting recommendation result: " + meeting.getRecommendationResult());
+
         try {
-            Meeting meeting = meetingRepo.findByMeetingId(meetingId)
-                    .orElseThrow(() -> new RuntimeException("Meeting not found: " + meetingId));
-            
-            if (meeting.getRecommendationResult() == null) {
-                throw new RuntimeException("No recommendation found for meeting: " + meetingId);
-            }
-            
-            MeetResponse response = objectMapper.readValue(meeting.getRecommendationResult(), MeetResponse.class);
-            return new MeetResponse(meetingId, response.getRegions());
-            
+            // JSON을 Map으로 파싱한 후 regions 추출
+            Map<String, Object> jsonMap = objectMapper.readValue(meeting.getRecommendationResult(), Map.class);
+            List<RegionRecommendation> regions = objectMapper.convertValue(
+                jsonMap.get("regions"), 
+                new com.fasterxml.jackson.core.type.TypeReference<List<RegionRecommendation>>() {}
+            );
+            return new MeetResponse(meetingId, regions);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get meeting recommendation", e);
+            throw new RuntimeException("Failed to parse recommendation data for meeting ID: " + meetingId, e);
         }
     }
 
